@@ -8,6 +8,7 @@ package main
 
 import (
 	"github.com/truly-indian/reverseImageSearch/internal/config"
+	"github.com/truly-indian/reverseImageSearch/internal/crawler"
 	"github.com/truly-indian/reverseImageSearch/internal/reverseimagegenerator"
 	"github.com/truly-indian/reverseImageSearch/internal/server"
 	"github.com/truly-indian/reverseImageSearch/internal/serviceclients"
@@ -22,7 +23,8 @@ func InitDependencies() (ServerDependencies, error) {
 	client := server.NewHTTPClient()
 	httpClient := utils.GetHTTPClient()
 	serpAPIClient := serviceclients.NewSerpAPIClient(client, configConfig, httpClient)
-	service := reverseimagegenerator.NewService(configConfig, serpAPIClient)
+	crawlerCrawler := crawler.NewCrawler(configConfig)
+	service := reverseimagegenerator.NewService(configConfig, serpAPIClient, crawlerCrawler)
 	handler := reverseimagegenerator.NewHandler(configConfig, service)
 	handlers := server.Handlers{
 		ReverseImageGenerator: handler,

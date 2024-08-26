@@ -26,7 +26,6 @@ func (h *Handler) HellowWorldHandler(ctx *gin.Context) {
 }
 
 func (h *Handler) ReverseImageGenerator(ctx *gin.Context) {
-	fmt.Println("Reverse Image Generator Entry Point")
 
 	var reverseImageGenerator types.ReverseImageGeneratorRequest
 

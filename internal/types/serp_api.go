@@ -20,12 +20,19 @@ type SearchParameters struct {
 
 // VisualMatch represents a visual match result
 type VisualMatch struct {
-	Position   int    `json:"position"`
-	Title      string `json:"title"`
-	Link       string `json:"link"`
-	Source     string `json:"source"`
-	SourceIcon string `json:"source_icon"`
-	Thumbnail  string `json:"thumbnail"`
+	Position   int      `json:"position"`
+	Title      string   `json:"title"`
+	Link       string   `json:"link"`
+	Source     string   `json:"source"`
+	SourceIcon string   `json:"source_icon"`
+	Thumbnail  string   `json:"thumbnail"`
+	Price      VisPrice `json:"price"`
+}
+
+type VisPrice struct {
+	Value           string  `json:"value"`
+	Extracted_value float32 `json:"extracted_value"`
+	Currency        string  `json:"currency"`
 }
 
 type ImageSourcesSearch struct {

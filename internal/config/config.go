@@ -40,6 +40,10 @@ func InitDefaultConfig() *Config {
 	return InitConfig("application")
 }
 
+func (c *Config) IsProductionEnv() bool {
+	return c.Environment == "production"
+}
+
 func InitConfig(configname string) *Config {
 	viper.AutomaticEnv()
 	viper.SetConfigName(configname)

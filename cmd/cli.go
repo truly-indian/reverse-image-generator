@@ -26,7 +26,6 @@ func startCommand() *cobra.Command {
 			if len(args) > 0 {
 				configFile = args[0]
 			}
-
 			configConfig := config.InitConfig(configFile)
 			fmt.Println("configs: ", configConfig)
 			serverDependencies, _ := InitDependencies()
