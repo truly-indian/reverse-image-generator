@@ -13,11 +13,11 @@ assign-vars = $(if $(1),$(1),$(shell grep '$(2):' application.yml | tail -n1 | c
 PWD := $(shell cd .. && pwd -L)
 
 gen-wire-deps:
-	cd cmd/reverse-image-generator && wire && cd ../..
+	cd cmd/ && wire && cd ../..
 
 compile:
 	mkdir -p out/
-	go build -o $(APP_EXECUTABLE) -ldflags "-X main.version=$(APP_VERSION) -X main.commit=$(APP_COMMIT)" ./cmd/reverse-image-generator
+	go build -o $(APP_EXECUTABLE) -ldflags "-X main.version=$(APP_VERSION) -X main.commit=$(APP_COMMIT)" ./cmd
 
 fmt:
 	go fmt $(ALL_PACKAGES)

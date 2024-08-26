@@ -5,9 +5,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/truly-indian/reverseImageSearch/internal/config"
+	"github.com/truly-indian/reverseImageSearch/internal/reverseimagegenerator"
 )
 
 type Handlers struct {
+	ReverseImageGenerator *reverseimagegenerator.Handler
 }
 
 func (h *Handlers) HelloWorldHandler(c *gin.Context) {
@@ -19,4 +21,5 @@ func (h *Handlers) HelloWorldHandler(c *gin.Context) {
 func (s *Server) InitRoutes(h Handlers, c *config.Config) {
 	router := s.routerGroups.rootRouter
 	router.GET("/hello-world", h.HelloWorldHandler)
+	h.ReverseImageGenerator.InitRoutes(router)
 }

@@ -8,6 +8,7 @@ package main
 
 import (
 	"github.com/truly-indian/reverseImageSearch/internal/config"
+	"github.com/truly-indian/reverseImageSearch/internal/reverseimagegenerator"
 	"github.com/truly-indian/reverseImageSearch/internal/server"
 )
 
@@ -16,7 +17,10 @@ import (
 func InitDependencies() (ServerDependencies, error) {
 	configConfig := config.GetConfig()
 	serverServer := server.NewServer(configConfig)
-	handlers := server.Handlers{}
+	handler := reverseimagegenerator.NewHandler(configConfig)
+	handlers := server.Handlers{
+		ReverseImageGenerator: handler,
+	}
 	serverDependencies := ServerDependencies{
 		config:   configConfig,
 		server:   serverServer,
