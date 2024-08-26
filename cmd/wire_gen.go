@@ -17,7 +17,8 @@ import (
 func InitDependencies() (ServerDependencies, error) {
 	configConfig := config.GetConfig()
 	serverServer := server.NewServer(configConfig)
-	handler := reverseimagegenerator.NewHandler(configConfig)
+	service := reverseimagegenerator.NewService(configConfig)
+	handler := reverseimagegenerator.NewHandler(configConfig, service)
 	handlers := server.Handlers{
 		ReverseImageGenerator: handler,
 	}
