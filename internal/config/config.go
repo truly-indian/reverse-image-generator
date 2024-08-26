@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -13,6 +14,12 @@ type Config struct {
 	Server      ServerConfig
 	Environment string
 	Google      GoogleConfig
+	SerpAPI     API
+	Secrets     SecretConfigs
+}
+
+type SecretConfigs struct {
+	SerpAPIKey string `json:"serpAPIKey"`
 }
 
 type ServerConfig struct {
@@ -63,4 +70,22 @@ func GetConfig() *Config {
 
 func (c *Config) ListenAddress() string {
 	return ":" + strconv.Itoa(c.Server.Port)
+}
+
+func (c *Config) GetSerpAPI() string {
+	return c.SerpAPI.Path
+}
+
+func (c *Config) GetSerpAPITimeOutInMs() time.Duration {
+	duration, err := time.ParseDuration(strconv.Itoa(c.SerpAPI.TimeoutInMs) + "ms")
+	if err != nil {
+		panic(err)
+	}
+	return duration
+}
+
+func (c *Config) GetSecrets() map[string]string {
+	mp := make(map[string]string)
+	mp["serpAPIKey"] = c.Secrets.SerpAPIKey
+	return mp
 }

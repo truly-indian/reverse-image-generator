@@ -8,6 +8,8 @@ import (
 	"github.com/truly-indian/reverseImageSearch/internal/config"
 	"github.com/truly-indian/reverseImageSearch/internal/reverseimagegenerator"
 	"github.com/truly-indian/reverseImageSearch/internal/server"
+	"github.com/truly-indian/reverseImageSearch/internal/serviceclients"
+	"github.com/truly-indian/reverseImageSearch/internal/utils"
 )
 
 type ServerDependencies struct {
@@ -23,6 +25,8 @@ func InitDependencies() (ServerDependencies, error) {
 		server.WireSet,
 		config.GetConfig,
 		reverseimagegenerator.WireSet,
+		serviceclients.WireSet,
+		utils.WireSet,
 	)
 
 	return ServerDependencies{}, nil
