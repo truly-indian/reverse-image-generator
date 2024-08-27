@@ -10,20 +10,20 @@
 
 - Reverse Image Genrator API:
 
-  end_point: /api/v1/reverse_image_generator
-  request_body: {
-    "imageUrl": "some image url pointing to image",
-    "pageToken": 1
-  }
-  response: {
-    "Products": [
-      {
-        "productName": "name of the product",
-        "price": "price of the product",
-        "rating": "1"
+      end_point: /api/v1/reverse_image_generator
+      request_body: {
+        "imageUrl": "some image url pointing to image",
+        "pageToken": 1
       }
-    ]
-  }
+      response: {
+        "Products": [
+          {
+            "productName": "name of the product",
+            "price": "price of the product",
+            "rating": "1"
+          }
+        ]
+      }
 
 # Steps To Run the Project
 - Clone the repository.
