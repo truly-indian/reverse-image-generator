@@ -38,7 +38,7 @@
 - Running Dockerized Application
 
       - Pull the image using this command
-          docker pull deepakmalik1999/reverse-image-generator:1.0.0
+          docker pull deepakmalik1999/reverse-image-generator:1.1.0
       - Run this command
           docker run -d \
               -e SERP_API_KEY=your_serp_api_key \
