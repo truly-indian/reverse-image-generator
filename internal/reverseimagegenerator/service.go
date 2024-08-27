@@ -39,7 +39,6 @@ func NewService(
 }
 
 func (s *serviceImpl) ReverseImageGenerator(req types.ReverseImageGeneratorRequest) (types.ReverseImageGeneratorResponse, error) {
-	limit := 5
 	imageUrl := req.ImageUrl
 	page := req.Page
 
@@ -50,13 +49,6 @@ func (s *serviceImpl) ReverseImageGenerator(req types.ReverseImageGeneratorReque
 			return types.ReverseImageGeneratorResponse{}, err
 		}
 		db[imageUrl] = serpResp.VisualMatches
-	}
-	startIndex := (page - 1) * limit
-
-	if startIndex > len(db[imageUrl]) {
-		return types.ReverseImageGeneratorResponse{
-			Products: []types.Product{},
-		}, nil
 	}
 	productList := getProductList(s, imageUrl, page, 5)
 
