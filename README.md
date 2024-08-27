@@ -41,9 +41,10 @@
           docker pull deepakmalik1999/reverse-image-generator:1.0.0
       - Run this command
           docker run -d \
-          -e SERPAPI_KEY=YOUR_SERP_API_KEY \
-          --name reverse-image-generator \
-          reverse-image-generator
+              -e SERPAPI_KEY=YOUR_SERP_API_KEY \
+              -p 8080:8080 \
+              --name reverse-image-generator \
+              deepakmalik1999/reverse-image-generator:1.0.0
   
 
 
