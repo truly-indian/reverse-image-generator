@@ -2,9 +2,9 @@
 - It is a backend service that powers a website which requires a reverse image search functionality.
 
 # Tech Stack Used
-  Golang
-  Gin
-  Google Wire
+    Golang
+    Gin
+    Google Wire
 
 # API Details
 
