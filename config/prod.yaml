@@ -1,0 +1,11 @@
+server:
+  host: localhost
+  port: 8080
+
+serpAPI: 
+  path: https://serpapi.com/search?engine={googleEngine}&url={imageUrl}&api_key={key}
+  timeoutInMs: 5000
+
+secrets: 
+  serpAPIKey: ${SERP_API_KEY}
+

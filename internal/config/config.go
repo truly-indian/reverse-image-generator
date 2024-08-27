@@ -2,7 +2,9 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/spf13/viper"
@@ -45,9 +47,9 @@ func (c *Config) IsProductionEnv() bool {
 }
 
 func InitConfig(configname string) *Config {
-	viper.AutomaticEnv()
 	viper.SetConfigName(configname)
 	viper.SetConfigType("yaml")
+	viper.AutomaticEnv()
 	viper.AddConfigPath("config")
 	viper.AddConfigPath("../config/")
 	viper.AddConfigPath("../../config/")
@@ -60,12 +62,50 @@ func InitConfig(configname string) *Config {
 		panic(err)
 	}
 
-	err := viper.Unmarshal(&AppConfig)
+	err := replaceEnvVariablesInViper()
+	if err != nil {
+		fmt.Println("Error processing the YAML file:", err)
+		panic(err)
+	}
+
+	err = viper.Unmarshal(&AppConfig)
 	if err != nil {
 		panic(fmt.Errorf("fatal error unable to unmarshal config file: %s", err))
 	}
 
 	return &AppConfig
+}
+
+func replaceEnvVariablesInViper() error {
+	for _, key := range viper.AllKeys() {
+		value := viper.GetString(key)
+
+		// Check if value contains a placeholder for an environment variable
+		if strings.Contains(value, "${") {
+			// Extract the environment variable from the placeholder
+			envVar := extractEnvVar(value)
+			if envVar != "" {
+				envValue := os.Getenv(envVar)
+				if envValue != "" {
+					// Replace the placeholder with the actual environment variable value
+					viper.Set(key, envValue)
+				} else {
+					fmt.Printf("Environment variable %s is not set\n", envVar)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// extractEnvVar extracts the environment variable name from the placeholder
+func extractEnvVar(value string) string {
+	start := strings.Index(value, "${")
+	end := strings.Index(value, "}")
+	if start != -1 && end != -1 && end > start {
+		return value[start+2 : end]
+	}
+	return ""
 }
 
 func GetConfig() *Config {
