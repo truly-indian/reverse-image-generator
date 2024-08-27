@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/truly-indian/reverseImageSearch/internal/config"
+	"github.com/truly-indian/reverseImageSearch/internal/logger"
 	"github.com/truly-indian/reverseImageSearch/internal/types"
 	"github.com/truly-indian/reverseImageSearch/internal/utils"
 )
@@ -21,17 +22,20 @@ type serpAPIClient struct {
 	client     *http.Client
 	config     *config.Config
 	httpClient utils.HTTPClient
+	logger     logger.Logger
 }
 
 func NewSerpAPIClient(
 	client *http.Client,
 	cfg *config.Config,
 	httpClient utils.HTTPClient,
+	logger logger.Logger,
 ) SerpAPIClient {
 	return &serpAPIClient{
 		client:     client,
 		config:     cfg,
 		httpClient: httpClient,
+		logger:     logger,
 	}
 }
 
@@ -44,7 +48,7 @@ func (s *serpAPIClient) GetReverseImageData(imageUrl string) (types.SerpAPIRespo
 	})
 
 	if err != nil {
-		fmt.Println("error while making serp api call: ", err)
+		s.logger.LogError(fmt.Sprintf("error while making serp api call for imageUrl: %v", imageUrl), err)
 		return types.SerpAPIResponse{}, err
 	}
 
@@ -52,13 +56,13 @@ func (s *serpAPIClient) GetReverseImageData(imageUrl string) (types.SerpAPIRespo
 		var serpAPIResponse types.SerpAPIResponse
 		unMarshalErr := json.Unmarshal(resp.Body, &serpAPIResponse)
 		if unMarshalErr != nil {
-			fmt.Println("error while unmarshalleing serp response: ", unMarshalErr)
+			s.logger.LogError(fmt.Sprintf("error while unmarshalleing serp response for imageUrl: %v", imageUrl), unMarshalErr)
 			return types.SerpAPIResponse{}, unMarshalErr
 		}
 		return serpAPIResponse, nil
 	}
 
-	fmt.Println("serp API response is not 200, it is: ", resp.StatusCode)
+	s.logger.LogError(fmt.Sprintf("serp API response is not 200, it is for imageUrl: %v", imageUrl), err)
 	return types.SerpAPIResponse{}, errors.New("internal server error")
 }
 

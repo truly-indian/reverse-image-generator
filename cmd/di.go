@@ -7,6 +7,7 @@ import (
 	"github.com/google/wire"
 	"github.com/truly-indian/reverseImageSearch/internal/config"
 	"github.com/truly-indian/reverseImageSearch/internal/crawler"
+	"github.com/truly-indian/reverseImageSearch/internal/logger"
 	"github.com/truly-indian/reverseImageSearch/internal/reverseimagegenerator"
 	"github.com/truly-indian/reverseImageSearch/internal/server"
 	"github.com/truly-indian/reverseImageSearch/internal/serviceclients"
@@ -21,6 +22,7 @@ type ServerDependencies struct {
 
 func InitDependencies() (ServerDependencies, error) {
 	wire.Build(
+		logger.WireSet,
 		wire.Struct(new(ServerDependencies), "*"),
 		wire.Struct(new(server.Handlers), "*"),
 		server.WireSet,

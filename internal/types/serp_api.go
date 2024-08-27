@@ -27,6 +27,7 @@ type VisualMatch struct {
 	SourceIcon string   `json:"source_icon"`
 	Thumbnail  string   `json:"thumbnail"`
 	Price      VisPrice `json:"price"`
+	Rating     float32  `json:"rating"`
 }
 
 type VisPrice struct {

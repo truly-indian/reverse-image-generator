@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 	"github.com/truly-indian/reverseImageSearch/internal/config"
 )
@@ -26,8 +24,9 @@ func startCommand() *cobra.Command {
 			if len(args) > 0 {
 				configFile = args[0]
 			}
-			configConfig := config.InitConfig(configFile)
-			fmt.Println("configs: ", configConfig)
+
+			_ = config.InitConfig(configFile)
+
 			serverDependencies, _ := InitDependencies()
 			serverDependencies.server.Run(serverDependencies.handlers)
 		},

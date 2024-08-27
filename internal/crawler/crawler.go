@@ -2,10 +2,12 @@ package crawler
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/truly-indian/reverseImageSearch/internal/config"
+	"github.com/truly-indian/reverseImageSearch/internal/logger"
 	"github.com/truly-indian/reverseImageSearch/internal/types"
 )
 
@@ -15,11 +17,13 @@ type Crawler interface {
 
 type crawlerImpl struct {
 	config *config.Config
+	logger logger.Logger
 }
 
-func NewCrawler(c *config.Config) Crawler {
+func NewCrawler(c *config.Config, logger logger.Logger) Crawler {
 	return &crawlerImpl{
 		config: c,
+		logger: logger,
 	}
 }
 
@@ -28,16 +32,23 @@ func (cr *crawlerImpl) CrawlUrl(link string) (types.Product, error) {
 	product := types.Product{}
 
 	c.SetRequestTimeout(1 * time.Second)
+
 	c.OnHTML("title, h1, meta[property='og:title']", func(e *colly.HTMLElement) {
 		product.Name = e.Text
 	})
 
 	c.OnHTML("span.price, div.price, meta[property='og:price:amount", func(e *colly.HTMLElement) {
-		product.Price = e.Text
+		price, _ := strconv.ParseFloat(e.Text, 32)
+		product.Price = float32(price)
+	})
+
+	c.OnHTML("span.rating, div.rating, meta[property='og:rating:user-rating']", func(e *colly.HTMLElement) {
+		rating, _ := strconv.ParseFloat(e.Text, 32)
+		product.UserRating = float32(rating)
 	})
 
 	c.OnError(func(_ *colly.Response, err error) {
-		fmt.Println("something went wrong while crawling: ", err, link)
+		cr.logger.LogError(fmt.Sprintf("something went wrong while crawling: %v", link), err)
 	})
 
 	err := c.Visit(link)

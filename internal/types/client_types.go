@@ -16,5 +16,5 @@ type ReverseImageGeneratorRequest struct {
 }
 
 type ReverseImageGeneratorResponse struct {
-	Products []Product
+	Products []Product `json:"products"`
 }

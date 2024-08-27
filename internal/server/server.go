@@ -11,24 +11,22 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/truly-indian/reverseImageSearch/internal/config"
+	"github.com/truly-indian/reverseImageSearch/internal/logger"
 )
 
 type Server struct {
 	config       *config.Config
 	engine       *gin.Engine
 	routerGroups RouterGroups
+	logger       logger.Logger
 }
 
 type RouterGroups struct {
 	rootRouter *gin.Engine
 }
 
-func NewServer(c *config.Config) *Server {
+func NewServer(c *config.Config, logger logger.Logger) *Server {
 	engine := gin.New()
-	loggerConfig := gin.LoggerConfig{
-		SkipPaths: []string{"/sanity", "/health"},
-	}
-	engine.Use(LoggerWithConfig(loggerConfig), gin.Recovery())
 
 	return &Server{
 		config: c,
@@ -36,6 +34,7 @@ func NewServer(c *config.Config) *Server {
 		routerGroups: RouterGroups{
 			rootRouter: engine,
 		},
+		logger: logger,
 	}
 }
 
@@ -47,7 +46,7 @@ func (s *Server) Run(h Handlers) {
 	}
 
 	go listenServer(srv)
-	fmt.Println("Server is up and running Successfully :) !!")
+	s.logger.LogInfo("Server is up and running Successfully :) !!")
 	waitForShutdown(srv)
 }
 
@@ -69,66 +68,4 @@ func waitForShutdown(server *http.Server) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	server.Shutdown(ctx)
-}
-
-// LoggerWithConfig instance a Logger middleware with config.
-func LoggerWithConfig(conf gin.LoggerConfig) gin.HandlerFunc {
-
-	notlogged := conf.SkipPaths
-
-	var skip map[string]struct{}
-
-	if length := len(notlogged); length > 0 {
-		skip = make(map[string]struct{}, length)
-
-		for _, path := range notlogged {
-			skip[path] = struct{}{}
-		}
-	}
-
-	return func(c *gin.Context) {
-		// Start timer
-		start := time.Now()
-		path := c.Request.URL.Path
-		raw := c.Request.URL.RawQuery
-
-		// Process request
-		c.Next()
-
-		// Log only when path is not being skipped
-		if _, ok := skip[path]; !ok {
-			param := gin.LogFormatterParams{
-				Request: c.Request,
-				Keys:    c.Keys,
-			}
-
-			// Stop timer
-			param.TimeStamp = time.Now()
-			param.Latency = param.TimeStamp.Sub(start)
-
-			param.ClientIP = c.ClientIP()
-			param.Method = c.Request.Method
-			param.StatusCode = c.Writer.Status()
-			param.ErrorMessage = c.Errors.ByType(gin.ErrorTypePrivate).String()
-			//userId := c.Request.Header.Get("userId")
-			param.BodySize = c.Writer.Size()
-
-			if raw != "" {
-				path = path + "?" + raw
-			}
-
-			// logger.Info(logger.Format{
-			// 	Message: fmt.Sprintf("Accessing %s", path),
-			// 	Data: map[string]string{
-			// 		"method":     param.Method,
-			// 		"clientIP":   param.ClientIP,
-			// 		"statusCode": strconv.Itoa(param.StatusCode),
-			// 		"error":      param.ErrorMessage,
-			// 		"latency":    param.Latency.String(),
-			// 		"size":       strconv.Itoa(param.BodySize),
-			// 		"userId":     userId,
-			// 	},
-			// })
-		}
-	}
 }
