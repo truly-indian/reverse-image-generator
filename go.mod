@@ -1,6 +1,8 @@
 module github.com/truly-indian/reverseImageSearch
 
-go 1.22
+go 1.22.2
+
+toolchain go1.22.6
 
 require (
 	github.com/gocolly/colly/v2 v2.1.0
@@ -30,6 +32,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/jpoz/groq v0.0.0-20240513145022-7a02894105a0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
