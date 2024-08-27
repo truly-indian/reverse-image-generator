@@ -50,7 +50,7 @@ func (lc *llmCrawlerImpl) LLMCrawl(link string) (types.Product, error) {
 }
 
 func fetchFromGroq(lc *llmCrawlerImpl, link string) (types.Product, error) {
-	prompt := fmt.Sprintf("Extract product name as string, product price as float and product rating as float from this link: %v and return the response in json format always like this {name: \"abc\", \"price\":12, \"rating\":5.4}. Just return me the json and nothing else. No extra word please, just the json. Make sure you return only one json", link)
+	prompt := fmt.Sprintf("Extract product name as string, product price as float and product rating as float from this link: %v and return the response in json format always like this {name: \"abc\", \"price\":12, \"rating\":5.4}. Just return me the json and nothing else. No extra word please, just the json. Make sure you return only one json object as result and no array of objects.", link)
 
 	resp, err := lc.groqClient.CreateChatCompletion(groq.CompletionCreateParams{
 		Model: "llama3-8b-8192",

@@ -41,10 +41,12 @@
           docker pull deepakmalik1999/reverse-image-generator:1.0.0
       - Run this command
           docker run -d \
-              -e SERPAPI_KEY=YOUR_SERP_API_KEY \
+              -e SERP_API_KEY=your_serp_api_key \
+              -e OPEN_AI_API_KEY=your_apoen_ai_key \
+              -e GROQ_AI_KEY=your groq_api_key \
               -p 8080:8080 \
               --name reverse-image-generator \
-              deepakmalik1999/reverse-image-generator:1.0.1
+              deepakmalik1999/reverse-image-generator:1.1.0
   
 # License
 - MIT LICENSED
