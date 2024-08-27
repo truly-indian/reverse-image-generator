@@ -64,7 +64,7 @@ func (cr *crawlerImpl) CrawlUrl(link string) (types.Product, error) {
 	}
 
 	if product.Name == "" || product.Price == 0.0 || product.UserRating == 0.0 {
-		fmt.Println("using LLM Crawl")
+		cr.logger.LogInfo("Fetching Product Details from LLM Crawler")
 		product, _ = cr.llmCrawler.LLMCrawl(link)
 	}
 
