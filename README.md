@@ -27,19 +27,24 @@
 
 # Steps To Run the Project
 - Build from source
+
       Clone the repository.
          Make sure that you have go, wire installed on your system if not please install them first.
          Run this command to build
           make compile
          Run this command to run the project
           ./out/reverse-image-generator start
-- Running Docker container
+
+- Running Dockerized Application
+
       Pull the iamge
       Run this command
           docker run -d \
           -e SERPAPI_KEY=YOUR_SERP_API_KEY \
           --name reverse-image-generator \
           reverse-image-generator
+  
+
 
 # Screen Shots
 <img width="1391" alt="Screenshot 2024-08-27 at 8 32 45 AM" src="https://github.com/user-attachments/assets/83128e49-633c-4a83-ab54-e283a8d872bf">
