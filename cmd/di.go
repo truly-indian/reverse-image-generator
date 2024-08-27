@@ -7,6 +7,7 @@ import (
 	"github.com/google/wire"
 	"github.com/truly-indian/reverseImageSearch/internal/config"
 	"github.com/truly-indian/reverseImageSearch/internal/crawler"
+	"github.com/truly-indian/reverseImageSearch/internal/groq"
 	"github.com/truly-indian/reverseImageSearch/internal/logger"
 	"github.com/truly-indian/reverseImageSearch/internal/openai"
 	"github.com/truly-indian/reverseImageSearch/internal/reverseimagegenerator"
@@ -33,6 +34,7 @@ func InitDependencies() (ServerDependencies, error) {
 		utils.WireSet,
 		crawler.WireSet,
 		openai.WireSet,
+		groq.WireSet,
 	)
 
 	return ServerDependencies{}, nil
