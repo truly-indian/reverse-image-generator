@@ -22,6 +22,7 @@ type Config struct {
 
 type SecretConfigs struct {
 	SerpAPIKey string `json:"serpAPIKey"`
+	OpenAIKey  string `json:"openAIKey"`
 }
 
 type ServerConfig struct {
@@ -131,5 +132,6 @@ func (c *Config) GetSerpAPITimeOutInMs() time.Duration {
 func (c *Config) GetSecrets() map[string]string {
 	mp := make(map[string]string)
 	mp["serpAPIKey"] = c.Secrets.SerpAPIKey
+	mp["openAIKey"] = c.Secrets.OpenAIKey
 	return mp
 }

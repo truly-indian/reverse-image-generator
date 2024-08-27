@@ -16,14 +16,20 @@ type Crawler interface {
 }
 
 type crawlerImpl struct {
-	config *config.Config
-	logger logger.Logger
+	config     *config.Config
+	logger     logger.Logger
+	llmCrawler LLMCrawler
 }
 
-func NewCrawler(c *config.Config, logger logger.Logger) Crawler {
+func NewCrawler(
+	c *config.Config,
+	logger logger.Logger,
+	llmCrawler LLMCrawler,
+) Crawler {
 	return &crawlerImpl{
-		config: c,
-		logger: logger,
+		config:     c,
+		logger:     logger,
+		llmCrawler: llmCrawler,
 	}
 }
 
@@ -55,6 +61,11 @@ func (cr *crawlerImpl) CrawlUrl(link string) (types.Product, error) {
 
 	if err != nil {
 		return types.Product{}, err
+	}
+
+	if product.Name == "" || product.Price == 0.0 || product.UserRating == 0.0 {
+		cr.logger.LogInfo("Fetching Product Details from LLM Crawler")
+		product, _ = cr.llmCrawler.LLMCrawl(link)
 	}
 
 	return product, nil

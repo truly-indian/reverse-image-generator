@@ -8,4 +8,5 @@ serpAPI:
 
 secrets: 
   serpAPIKey: ${SERP_API_KEY}
+  openAIKey: ${OPEN_AI_API_KEY}
 
