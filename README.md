@@ -73,4 +73,4 @@
 
 
 # Screen Shots
-<img width="1391" alt="Screenshot 2024-08-27 at 8 32 45 AM" src="https://github.com/user-attachments/assets/83128e49-633c-4a83-ab54-e283a8d872bf">
+<img width="1415" alt="Screenshot 2024-08-27 at 6 54 18 PM" src="https://github.com/user-attachments/assets/3f8eca13-ce41-4013-a17b-9744ad0bf6fd">
