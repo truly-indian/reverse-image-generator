@@ -44,7 +44,7 @@
               -e SERPAPI_KEY=YOUR_SERP_API_KEY \
               -p 8080:8080 \
               --name reverse-image-generator \
-              deepakmalik1999/reverse-image-generator:1.0.0
+              deepakmalik1999/reverse-image-generator:1.0.1
   
 
 
