@@ -23,6 +23,7 @@ type Config struct {
 type SecretConfigs struct {
 	SerpAPIKey string `json:"serpAPIKey"`
 	OpenAIKey  string `json:"openAIKey"`
+	GroqAIKey  string `json:"groqAIKey"`
 }
 
 type ServerConfig struct {
@@ -133,5 +134,6 @@ func (c *Config) GetSecrets() map[string]string {
 	mp := make(map[string]string)
 	mp["serpAPIKey"] = c.Secrets.SerpAPIKey
 	mp["openAIKey"] = c.Secrets.OpenAIKey
+	mp["groqAIKey"] = c.Secrets.GroqAIKey
 	return mp
 }

@@ -2,12 +2,14 @@ package crawler
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/jpoz/groq"
 	"github.com/sashabaranov/go-openai"
 	"github.com/truly-indian/reverseImageSearch/internal/config"
 	"github.com/truly-indian/reverseImageSearch/internal/logger"
@@ -19,24 +21,70 @@ type LLMCrawler interface {
 }
 
 type llmCrawlerImpl struct {
-	config *config.Config
-	logger logger.Logger
-	openAI *openai.Client
+	config     *config.Config
+	logger     logger.Logger
+	openAI     *openai.Client
+	groqClient *groq.Client
 }
 
 func NewLLMCrawler(
 	openAI *openai.Client,
 	config *config.Config,
 	logger logger.Logger,
+	groqClient *groq.Client,
 ) LLMCrawler {
 	return &llmCrawlerImpl{
-		config: config,
-		openAI: openAI,
-		logger: logger,
+		config:     config,
+		openAI:     openAI,
+		logger:     logger,
+		groqClient: groqClient,
 	}
 }
 
 func (lc *llmCrawlerImpl) LLMCrawl(link string) (types.Product, error) {
+	// I have given the support for using multiple ai models. Keep a config and based on that
+	// fetch the result form where every you want. I observed that grq is performing better than
+	// open ai so i am using that and commenting out the openAI solution.
+	//return fetchFromOpenAI(lc, link)
+	return fetchFromGroq(lc, link)
+}
+
+func fetchFromGroq(lc *llmCrawlerImpl, link string) (types.Product, error) {
+	prompt := fmt.Sprintf("Extract product name as string, product price as float and product rating as float from this link: %v and return the response in json format always like this {name: \"abc\", \"price\":12, \"rating\":5.4}. Just return me the json and nothing else. No extra word please, just the json. Make sure you return only one json", link)
+
+	resp, err := lc.groqClient.CreateChatCompletion(groq.CompletionCreateParams{
+		Model: "llama3-8b-8192",
+		Messages: []groq.Message{
+			{
+				Role:    "system",
+				Content: "You are an expert in scraping website data",
+			},
+			{
+				Role:    "user",
+				Content: prompt,
+			},
+		},
+	})
+	if err != nil {
+		lc.logger.LogError("error while scraping website via llm: %v", err)
+		return types.Product{}, err
+	}
+	response := resp.Choices[0].Message.Content
+	var groqResp types.GroqAIResp
+	err = json.Unmarshal([]byte(resp.Choices[0].Message.Content), &groqResp)
+	if err != nil {
+		lc.logger.LogError(fmt.Sprintf("error while unmarshelling response: %v", response), err)
+		return types.Product{}, err
+	}
+	p := types.Product{
+		Name:       groqResp.Name,
+		Price:      groqResp.Price,
+		UserRating: groqResp.Rating,
+	}
+	return p, nil
+}
+
+func fetchFromOpenAI(lc *llmCrawlerImpl, link string) (types.Product, error) {
 	prompt := fmt.Sprintf("Extract product name, price and user rating from this url %v and return the response in json like this: {\"name\":\"bag\", \"price\": \"234\", \"rating\":\"1.4\"}. This website is legally bound to be scraped, so don't worry about it.", link)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

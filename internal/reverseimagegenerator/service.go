@@ -60,7 +60,6 @@ func (s *serviceImpl) ReverseImageGenerator(req types.ReverseImageGeneratorReque
 func getProductList(s *serviceImpl, imageUrl string, pageToken int, limit int) []types.Product {
 	productList := []types.Product{}
 	startIndex := (pageToken - 1) * limit
-
 	if startIndex >= len(db[imageUrl]) {
 		return productList
 	}
