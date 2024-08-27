@@ -65,6 +65,9 @@ func getProductList(s *serviceImpl, imageUrl string, pageToken int, limit int) [
 	}
 
 	for i := startIndex; i < len(db[imageUrl]); i++ {
+		if len(productList) >= limit {
+			return productList
+		}
 		vismatch := db[imageUrl][i]
 		product := types.Product{}
 
@@ -102,10 +105,6 @@ func getProductList(s *serviceImpl, imageUrl string, pageToken int, limit int) [
 
 		if product.Name != "" || product.Price != 0.0 || product.UserRating != 0.0 {
 			productList = append(productList, product)
-		}
-
-		if len(productList) >= limit {
-			return productList
 		}
 	}
 

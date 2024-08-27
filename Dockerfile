@@ -13,4 +13,4 @@ RUN mkdir -p out/ \
 
 EXPOSE 8080
 
-CMD ["./out/reverse-image-generator", "start"]
+CMD ["./out/reverse-image-generator", "start", "prod"]
