@@ -29,17 +29,17 @@
 - Build from source
 
       Clone the repository.
-         Make sure that you have go, wire installed on your system if not please install them first.
-         Run this command to build
+         - Make sure that you have go, wire installed on your system if not please install them first.
+         - Run this command to build
           make compile
-         Run this command to run the project
+         - Run this command to run the project
           ./out/reverse-image-generator start
 
 - Running Dockerized Application
 
-      Pull the image using this command
-      docker pull deepakmalik1999/reverse-image-generator:1.0.0
-      Run this command
+      - Pull the image using this command
+          docker pull deepakmalik1999/reverse-image-generator:1.0.0
+      - Run this command
           docker run -d \
           -e SERPAPI_KEY=YOUR_SERP_API_KEY \
           --name reverse-image-generator \
