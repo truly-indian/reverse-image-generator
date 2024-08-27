@@ -3,8 +3,6 @@
 export GO111MODULE=on
 
 APP=reverse-image-generator
-APP_VERSION:=$(shell cat .version)
-APP_COMMIT:=$(shell git rev-parse HEAD)
 APP_EXECUTABLE="./out/$(APP)"
 ALL_PACKAGES=$(shell go list ./... | grep -v "vendor")
 
@@ -17,7 +15,7 @@ gen-wire-deps:
 
 compile:
 	mkdir -p out/
-	go build -o $(APP_EXECUTABLE) -ldflags "-X main.version=$(APP_VERSION) -X main.commit=$(APP_COMMIT)" ./cmd
+	go build -o $(APP_EXECUTABLE) ./cmd
 
 fmt:
 	go fmt $(ALL_PACKAGES)

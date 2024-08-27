@@ -1,6 +1,6 @@
 module github.com/truly-indian/reverseImageSearch
 
-go 1.22.6
+go 1.22
 
 require github.com/spf13/cobra v1.8.1
 
