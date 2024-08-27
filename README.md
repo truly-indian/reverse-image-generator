@@ -9,6 +9,7 @@
 # API Details
 
 - Reverse Image Genrator API:
+
   end_point: /api/v1/reverse_image_generator
   request_body: {
     "imageUrl": "some image url pointing to image",
