@@ -41,23 +41,24 @@ func NewLLMCrawler(
 	}
 }
 
-func (lc *llmCrawlerImpl) LLMCrawl(link string) (types.Product, error) {
+func (lc *llmCrawlerImpl) LLMCrawl(htmlContent string) (types.Product, error) {
 	// I have given the support for using multiple ai models. Keep a config and based on that
 	// fetch the result form where every you want. I observed that grq is performing better than
 	// open ai so i am using that and commenting out the openAI solution.
 	//return fetchFromOpenAI(lc, link)
-	return fetchFromGroq(lc, link)
+	return fetchFromGroq(lc, htmlContent)
 }
 
-func fetchFromGroq(lc *llmCrawlerImpl, link string) (types.Product, error) {
-	prompt := fmt.Sprintf("Extract product name as string, product price as float and product rating as float from this link: %v and return the response in json format always like this {name: \"abc\", \"price\":12, \"rating\":5.4}. Just return me the json and nothing else. No extra word please, just the json. Make sure you return only one json object as result and no array of objects.", link)
+func fetchFromGroq(lc *llmCrawlerImpl, htmlContent string) (types.Product, error) {
+	prompt := fmt.Sprintf(`Extract product name as string, product price as float, and product rating as float from this HTML:
+	%v Return the response in JSON format always like this: {"name": "abc", "price": 12, "rating": 5.4}.Just return the JSON and nothing else. No extra words, please. Make sure you return only one JSON object as the result and no array of objects.`, htmlContent)
 
 	resp, err := lc.groqClient.CreateChatCompletion(groq.CompletionCreateParams{
 		Model: "llama3-8b-8192",
 		Messages: []groq.Message{
 			{
 				Role:    "system",
-				Content: "You are an expert in scraping website data",
+				Content: "You are an expert in scraping website html data.",
 			},
 			{
 				Role:    "user",

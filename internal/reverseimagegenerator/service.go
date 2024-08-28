@@ -2,6 +2,7 @@ package reverseimagegenerator
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/truly-indian/reverseImageSearch/internal/config"
 	"github.com/truly-indian/reverseImageSearch/internal/crawler"
@@ -13,7 +14,10 @@ import (
 var db map[string][]types.VisualMatch = make(map[string][]types.VisualMatch)
 
 type Service interface {
-	ReverseImageGenerator(types.ReverseImageGeneratorRequest) (types.ReverseImageGeneratorResponse, error)
+	ReverseImageGenerator(
+		types.ReverseImageGeneratorRequest,
+		chan<- []types.Product,
+	) error
 }
 
 type serviceImpl struct {
@@ -29,84 +33,93 @@ func NewService(
 	crawler crawler.Crawler,
 	logger logger.Logger,
 ) Service {
-	service := &serviceImpl{
+	return &serviceImpl{
 		config:         config,
 		serviceClients: serviceClients,
 		crawler:        crawler,
 		logger:         logger,
 	}
-	return service
 }
 
-func (s *serviceImpl) ReverseImageGenerator(req types.ReverseImageGeneratorRequest) (types.ReverseImageGeneratorResponse, error) {
+func (s *serviceImpl) ReverseImageGenerator(req types.ReverseImageGeneratorRequest, productBatchChan chan<- []types.Product) error {
 	imageUrl := req.ImageUrl
-	page := req.Page
+	limit := 5
 
 	if len(db[imageUrl]) == 0 {
 		serpResp, err := s.serviceClients.GetReverseImageData(imageUrl)
 		if err != nil {
 			s.logger.LogError(fmt.Sprintf("error while fetching serp api details for imgUrl: %v", imageUrl), err)
-			return types.ReverseImageGeneratorResponse{}, err
+			return err
 		}
 		db[imageUrl] = serpResp.VisualMatches
 	}
-	productList := getProductList(s, imageUrl, page, 5)
 
-	return types.ReverseImageGeneratorResponse{
-		Products: productList,
-	}, nil
-}
+	visualMatches := db[imageUrl]
+	processBatch := func(start, end int) ([]types.Product, error) {
+		var wg sync.WaitGroup
+		results := make([]types.Product, end-start)
 
-func getProductList(s *serviceImpl, imageUrl string, pageToken int, limit int) []types.Product {
-	productList := []types.Product{}
-	startIndex := (pageToken - 1) * limit
-	if startIndex >= len(db[imageUrl]) {
-		return productList
-	}
-
-	for i := startIndex; i < len(db[imageUrl]); i++ {
-		if len(productList) >= limit {
-			return productList
-		}
-		vismatch := db[imageUrl][i]
-		product := types.Product{}
-
-		if vismatch.Title != "" {
-			product.Name = vismatch.Title
-		}
-		if vismatch.Price.Extracted_value != 0.0 {
-			product.Price = vismatch.Price.Extracted_value
-		}
-		if vismatch.Rating != 0.0 {
-			product.UserRating = vismatch.Rating
-		}
-		if product.Name == "" || product.Price == 0.0 || product.UserRating == 0.0 {
-			p, err := s.crawler.CrawlUrl(vismatch.Link)
-			if err != nil {
-				s.logger.LogError(fmt.Sprintf("error while crawling link: %v", vismatch.Link), err)
-				if product.Name != "" {
-					productList = append(productList, product)
+		for i := start; i < end; i++ {
+			wg.Add(1)
+			go func(i int) {
+				defer wg.Done()
+				match := visualMatches[i]
+				product := types.Product{
+					Name:       match.Title,
+					Price:      match.Price.Extracted_value,
+					UserRating: match.Rating,
 				}
-				continue
-			}
+				if product.Name == "" || product.Price == 0.0 || product.UserRating == 0.0 {
+					p, err := s.crawler.CrawlUrl(match.Link)
+					if err != nil {
+						s.logger.LogError(fmt.Sprintf("error while crawling link: %v", match.Link), err)
+						if product.Name != "" || product.Price != 0.0 || product.UserRating != 0.0 {
+							results[i-start] = product
+						}
+					}
+					if product.Name == "" && p.Name != "" {
+						product.Name = p.Name
+					}
+					if product.Price == 0.0 && p.Price != 0.0 {
+						product.Price = p.Price
+					}
+					if product.UserRating == 0.0 && p.UserRating != 0.0 {
+						product.UserRating = p.UserRating
+					}
+					if product.Name != "" || product.Price != 0.0 || product.UserRating != 0.0 {
+						results[i-start] = product
+					}
+				}
+			}(i)
+		}
+		wg.Wait()
 
-			if product.Name == "" && p.Name != "" {
-				product.Name = p.Name
-			}
+		return results, nil
+	}
 
-			if product.Price == 0.0 && p.Price != 0.0 {
-				product.Price = p.Price
-			}
-
-			if product.UserRating == 0.0 && p.UserRating != 0.0 {
-				product.UserRating = p.UserRating
-			}
+	for i := 0; i < len(visualMatches); i += limit {
+		start := i
+		end := i + limit
+		if end > len(visualMatches) {
+			end = len(visualMatches)
 		}
 
-		if product.Name != "" || product.Price != 0.0 || product.UserRating != 0.0 {
-			productList = append(productList, product)
+		batchProducts, err := processBatch(start, end)
+		var filteredResults []types.Product
+		for _, p := range batchProducts {
+			if p.Name != "" || p.Price != 0.0 || p.UserRating != 0.0 {
+				filteredResults = append(filteredResults, p)
+			}
+		}
+		if err != nil {
+			s.logger.LogError(fmt.Sprintf("error while processing batch from: %v to %v", start, end), err)
+			return err
+		}
+
+		if len(filteredResults) > 0 {
+			productBatchChan <- filteredResults
 		}
 	}
 
-	return productList
+	return nil
 }

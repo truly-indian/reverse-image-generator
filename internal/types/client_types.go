@@ -12,7 +12,6 @@ type Error struct {
 
 type ReverseImageGeneratorRequest struct {
 	ImageUrl string `json:"imageUrl" binding:"required"`
-	Page     int    `json:"page"`
 }
 
 type ReverseImageGeneratorResponse struct {
