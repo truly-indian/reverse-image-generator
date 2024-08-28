@@ -37,7 +37,13 @@ func (cr *crawlerImpl) CrawlUrl(link string) (types.Product, error) {
 	c := colly.NewCollector()
 	product := types.Product{}
 
-	c.SetRequestTimeout(1 * time.Second)
+	var htmlContent string
+
+	c.OnResponse(func(r *colly.Response) {
+		htmlContent = string(r.Body)
+	})
+
+	c.SetRequestTimeout(10 * time.Second)
 
 	c.OnHTML("title, h1, meta[property='og:title']", func(e *colly.HTMLElement) {
 		product.Name = e.Text
@@ -65,7 +71,7 @@ func (cr *crawlerImpl) CrawlUrl(link string) (types.Product, error) {
 
 	if product.Name == "" || product.Price == 0.0 || product.UserRating == 0.0 {
 		cr.logger.LogInfo("Fetching Product Details from LLM Crawler")
-		product, _ = cr.llmCrawler.LLMCrawl(link)
+		product, _ = cr.llmCrawler.LLMCrawl(htmlContent)
 	}
 
 	return product, nil
